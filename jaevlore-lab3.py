@@ -12,8 +12,8 @@ class MyTopology(Topo):
         Topo.__init__(self)
 
         ## Adding and linking switches 1 and 2
-        switch1 = self.addHost('s1')
-        switch2 = self.addHost('s2')
+        switch1 = self.addSwitch('s1')
+        switch2 = self.addSwitch('s2')
         self.addLink(switch1, switch2, delay="40ms")
 
         ## Adding the 4 hosts
