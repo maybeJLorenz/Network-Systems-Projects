@@ -8,23 +8,22 @@ class MyTopology(Topo):
   def __init__(self):
     Topo.__init__(self)
    
-    #Switches and links
-    s1 = self.addSwitch('s1')
-    s2 = self.addSwitch('s2')
-    self.addLink(s1,s2)
+    # Switches and links
+    Switch1 = self.addSwitch('s1')
+    Switch2 = self.addSwitch('s2')
+    self.addLink(Switch1, Switch2)
 
+    # Switch1 and devices 
+    Server = self.addHost('server', mac='00:00:00:00:00:10', ip='10.1.1.1') 
+    Laptop = self.addHost('laptop', mac='00:00:00:00:00:20', ip='10.1.1.2') 
+    self.addLink(Server, Switch1)
+    self.addLink(Laptop, Switch1)
 
-    #Switch1 and devices 
-    server = self.addHost('server',mac ='00:00:00:00:00:10', ip='10.1.1.1') 
-    laptop = self.addHost('laptop',mac ='00:00:00:00:00:20', ip='10.1.1.2') 
-    self.addLink(server,s1)
-    self.addLink(laptop,s1)
-
-    #Switch2 and devices 
-    lights = self.addHost('Lights',mac ='00:00:00:00:00:30', ip='10.1.2.1')
-    fridge = self.addHost('Fridge',mac ='00:00:00:00:00:40', ip='10.1.2.2')
-    self.addLink(lights,s2)
-    self.addLink(fridge,s2)
+    # Switch2 and devices 
+    Lights = self.addHost('Lights', mac='00:00:00:00:00:30', ip='10.1.2.1')
+    Fridge = self.addHost('Fridge', mac='00:00:00:00:00:40', ip='10.1.2.2')
+    self.addLink(Lights, Switch2)
+    self.addLink(Fridge, Switch2)
     
 
    
