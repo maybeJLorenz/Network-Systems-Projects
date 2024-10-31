@@ -24,7 +24,7 @@ class Firewall (object):
     ## implemented stuff to accept()
     def accept():
       msg = of.ofp_flow_mod()
-      msg.match = of.ofp_match.from_packet(packet)
+      msg.match = of.ofp_match.from_packet() # removed "packet"
       msg.idle_timeout = 45
       msg.hard_timeout = 600
       msg.actions.append(of.ofp_action_output(port=of.OFPP_NORMAL))
@@ -36,7 +36,7 @@ class Firewall (object):
     ## added to drop()
     def drop():
       msg = of.ofp_flow_mod()
-      msg.match = of.ofp_match.from_packet(packet)
+      msg.match = of.ofp_match.from_packet() ## removed "packet"
       msg.idle_timeout = 45
       msg.hard_timeout = 600
       msg.actions.append(of.ofp_action_output(port=of.OFPP_NORMAL))
