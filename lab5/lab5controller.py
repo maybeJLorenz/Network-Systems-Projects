@@ -49,11 +49,17 @@ class Firewall (object):
       msg.hard_timeout = 600
       print("Packet Dropped - Flow Table Installed on Switches")
 
-    if ip_header is None:
-      # Rule #1: allow ARP and ICMP for general connectivity
-      if arp_header or icmp_header:
-          accept()
-          return
+    # Rule #1: allow ARP and ICMP for general connectivity
+    if icmp_header:
+      if ip_header.srcip == server_ip:
+        drop()
+        return
+      accept()
+      return
+
+    if arp_header:
+      accept()
+      return
 
     # Rule #2: Web Traffic - allow all TCP traffic between laptop and server
     if tcp_header:
