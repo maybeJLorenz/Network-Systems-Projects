@@ -49,7 +49,7 @@ class Firewall (object):
       msg.hard_timeout = 600
       print("Packet Dropped - Flow Table Installed on Switches")
 
-    # Rule #1: allow ARP and ICMP for general connectivity
+    # Allow ARP and ICMP for general connectivity
     if icmp_header:
       if ip_header.srcip == server_ip:
         drop()
@@ -61,25 +61,25 @@ class Firewall (object):
       accept()
       return
 
-    # Rule #2: Web Traffic - allow all TCP traffic between laptop and server
+    # Web Traffic - allow all TCP traffic between laptop and server
     if tcp_header:
         if (ip_header.srcip == laptop_ip and ip_header.dstip == server_ip) or (ip_header.srcip == server_ip and ip_header.dstip == laptop_ip):
           accept()
           return
 
-    # Rule #3a: IoT Access - allow all TCP traffic between laptop and lights
+    #IoT Access - allow all TCP traffic between laptop and lights
     if tcp_header and (ip_header.srcip == laptop_ip and ip_header.dstip == lights_ip):
         accept()
         return
 
-    # Rule #3b: IoT Acess - allow all UDP traffic between laptop and fridge
+    #IoT Acess - allow all UDP traffic between laptop and fridge
     if udp_header and (ip_header.srcip == laptop_ip and ip_header.dstip == fridge_ip):
         accept()
         return
 
-    # Rule #4: Laptop/Server General Management - allow all UDP traffic between laptop and server
+    Laptop/Server General Management - allow all UDP traffic between laptop and server
     if udp_header:
-        if (ip_header.srcip == laptop_ip and ip_header.dstip == server_ip) or (ip_header.srcip == server_ip and ip_header.dstip == laptop_ip):
+        if (ip_header.srcip == laptop_ip and ip_header.dstip == server_ip):
             accept()
             return
 
