@@ -2,7 +2,7 @@
 #
 # Based on of_tutorial by James McCauley
 #
-# last modified: october 30, 6:45
+# last modified: october 30, 8:00
 
 from pox.core import core
 import pox.openflow.libopenflow_01 as of
@@ -34,7 +34,7 @@ class Firewall (object):
     def accept():
       msg = of.ofp_flow_mod()
       msg.data = packet_in
-      msg.match = of.ofp_match.from_packet()
+      msg.match = of.ofp_match.from_packet(packet)
       msg.idle_timeout = 45
       msg.hard_timeout = 600
       msg.actions.append(of.ofp_action_output(port=of.OFPP_NORMAL))
@@ -44,7 +44,7 @@ class Firewall (object):
 
     def drop():
       msg = of.ofp_flow_mod()
-      msg.match = of.ofp_match.from_packet()
+      msg.match = of.ofp_match.from_packet(packet)
       msg.idle_timeout = 45
       msg.hard_timeout = 600
       print("Packet Dropped - Flow Table Installed on Switches")
@@ -52,35 +52,36 @@ class Firewall (object):
     if ip_header is None:
       # Rule #1: allow ARP and ICMP for general connectivity
       if arp_header or icmp_header:
-          self.accept(packet, packet_in)
+          accept()
+          
       else:
-          self.drop(packet, packet_in)  # Drop other non-IP packets
+          drop()  # Drop other non-IP packets
           return
 
       # Rule #2: Web Traffic - allow all TCP traffic between laptop and server
       if tcp_header:
           if (ip_header.srcip == laptop_ip and ip_header.dstip == server_ip) or (ip_header.srcip == server_ip and ip_header.dstip == laptop_ip):
-            self.accept(packet, packet_in)
+            accept()
             return
 
       # Rule #3a: IoT Access - allow all TCP traffic between laptop and lights
       if tcp_header and (ip_header.srcip == laptop_ip and ip_header.dstip == lights_ip):
-          self.accept(packet, packet_in)
+          accept()
           return
 
       # Rule #3b: IoT Acess - allow all UDP traffic between laptop and fridge
       if udp_header and (ip_header.srcip == laptop_ip and ip_header.dstip == fridge_ip):
-          self.accept(packet, packet_in)
+          accept()
           return
 
       # Rule #4: Laptop/Server General Management - allow all UDP traffic between laptop and server
       if udp_header:
           if (ip_header.srcip == laptop_ip and ip_header.dstip == server_ip) or (ip_header.srcip == server_ip and ip_header.dstip == laptop_ip):
-              self.accept(packet, packet_in)
+              accept()
               return
 
       # Default Deny: Drop all other traffic
-      self.drop(packet)
+      drop()
 
   
   def _handle_PacketIn (self, event):
