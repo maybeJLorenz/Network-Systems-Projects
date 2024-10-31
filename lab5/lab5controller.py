@@ -2,7 +2,7 @@
 #
 # Based on of_tutorial by James McCauley
 #
-# last modified: october 30, 5:30
+# last modified: october 30, 6:45
 
 from pox.core import core
 import pox.openflow.libopenflow_01 as of
@@ -19,28 +19,28 @@ class Firewall (object):
     self.connection = connection
     connection.addListeners(self)
 
+  
   def do_firewall (self, packet, packet_in):
-    
+
     ## implemented stuff to accept()
-    def accept():
+    def accept(self, packet, packet_in):
       msg = of.ofp_flow_mod()
-      msg.match = of.ofp_match.from_packet() # removed "packet"
+      msg.data = packet_in
+      msg.match = of.ofp_match.from_packet(packet)
       msg.idle_timeout = 45
       msg.hard_timeout = 600
       msg.actions.append(of.ofp_action_output(port=of.OFPP_NORMAL))
-      msg.data = packet_in
       msg.buffer_id = packet_in.buffer_id
       self.connection.send(msg)
       print("Packet Accepted - Flow Table Installed on Switches")
 
     ## added to drop()
-    def drop():
+    def drop(packet, packet_in):
       msg = of.ofp_flow_mod()
-      msg.match = of.ofp_match.from_packet() ## removed "packet"
+      msg.data = packet_in
+      msg.match = of.ofp_match.from_packet(packet)
       msg.idle_timeout = 45
       msg.hard_timeout = 600
-      msg.actions.append(of.ofp_action_output(port=of.OFPP_NORMAL))
-      msg.data = packet_in
       msg.buffer_id = packet_in.buffer_id
       print("Packet Dropped - Flow Table Installed on Switches")
 
@@ -55,8 +55,8 @@ class Firewall (object):
     lights_ip = "10.1.2.1"
     fridge_ip = "10.1.2.2"
 
-    if ip_header is None:
-      return
+    # if ip_header is None:
+    #   return
     
     # Rule #1: allow ARP and ICMP for general connectivity
     if packet.find('arp') or packet.find('icmp'):
@@ -90,7 +90,7 @@ class Firewall (object):
               return
 
     # Default Deny: Drop all other traffic
-    self.drop(packet, packet_in)
+    self.drop(packet)
 
   
   def _handle_PacketIn (self, event):
@@ -108,4 +108,3 @@ class Firewall (object):
       log.debug("Controlling %s" % (event.connection,))
       Firewall(event.connection)
     core.openflow.addListenerByName("ConnectionUp", start_switch)
-
