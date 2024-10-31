@@ -53,9 +53,6 @@ class Firewall (object):
       # Rule #1: allow ARP and ICMP for general connectivity
       if arp_header or icmp_header:
           accept()
-          
-      else:
-          drop()  # Drop other non-IP packets
           return
 
       # Rule #2: Web Traffic - allow all TCP traffic between laptop and server
