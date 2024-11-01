@@ -2,7 +2,7 @@
 #
 # Based on of_tutorial by James McCauley
 #
-# last modified: october 30, 8:00
+# last modified: october 31, 10pm
 
 from pox.core import core
 import pox.openflow.libopenflow_01 as of
@@ -69,19 +69,19 @@ class Firewall (object):
 
     #IoT Access - allow all TCP traffic between laptop and lights
     if tcp_header:
-      if (ip_header.srcip == laptop_ip and ip_header.dstip == lights_ip) or (ip_header.srcip == lights_ip and ip_header.dst == laptop_ip):
+      if (ip_header.srcip == laptop_ip and ip_header.dstip == lights_ip) or (ip_header.srcip == lights_ip and ip_header.dstip == laptop_ip):
         accept()
         return
 
     #IoT Acess - allow all UDP traffic between laptop and fridge
     if udp_header:
-      if (ip_header.srcip == laptop_ip and ip_header.dstip == fridge_ip) or (ip_header.scrip == fridge_ip and ip_header.dstip == laptop_ip):
+      if (ip_header.srcip == laptop_ip and ip_header.dstip == fridge_ip) or (ip_header.srcip == fridge_ip and ip_header.dstip == laptop_ip):
         accept()
         return
 
     # Laptop/Server General Management - allow all UDP traffic between laptop and server
     if udp_header:
-        if (ip_header.srcip == laptop_ip and ip_header.dstip == server_ip) or (ip_header.scrip == server_ip and ip_header.dstip == laptop_ip):
+        if (ip_header.srcip == laptop_ip and ip_header.dstip == server_ip) or (ip_header.srcip == server_ip and ip_header.dstip == laptop_ip):
             accept()
             return
 
