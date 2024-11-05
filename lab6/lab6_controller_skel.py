@@ -48,7 +48,7 @@ class Routing (object):
       # Student Housing LAN
     student1_ip = "10.0.2.2/24"
     student2_ip = "10.0.2.40"
-    lab_ip = "10.0.2.40"
+    lab_ip = "10.0.2.3/24"
 
       # Internet
     trustedPC_ip = "10.0.203.6/32"
