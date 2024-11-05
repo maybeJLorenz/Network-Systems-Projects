@@ -21,6 +21,12 @@ class Routing (object):
     # switch_id - the switch which received this packet
 
     # Your code here
+      ip_header = packet.find('ipv4')
+      tcp_header = packet.find('tcp')
+      udp_header = packet.find('udp')
+      icmp_header = packet.find('icmp')
+      arp_header = packet.find('arp')  
+      
     pass
 
   def _handle_PacketIn (self, event):
