@@ -24,10 +24,14 @@ class Routing (object):
     # switch_id - the switch which received this packet
 
     # Your code here
+      ## Primary variables for packet
     ip_header = packet.find('ipv4')
     tcp_header = packet.find('tcp')
     udp_header = packet.find('udp')
     icmp_header = packet.find('icmp')
+
+    src_ip = packet.src_ip
+    dst_ip = packet.dst_ip
 
     ## Defining IPs
       # Univeristy Data Center
@@ -50,7 +54,7 @@ class Routing (object):
     lab_ip = "10.0.2.40"
 
       # Internet
-    trusted_ip = "10.0.203.6/32"
+    trustedPC_ip = "10.0.203.6/32"
     guest1_ip = "10.0.198.6/32"
     guest2_ip = "10.0.198.10/32"
 
@@ -73,16 +77,31 @@ class Routing (object):
       print("Packet Dropped - Flow Table Installed on Switches")
 
     # Rule #1: icmp between Student Housing, Faculty, and IT Dep. 
-    #    NO: Univeristy or Internet
+    #    NO: Univeristy or Internet subnet
+      if icmp_header:
+          if switch_id == 's2' or switch_id == 's3' or switch_id == 's4':
+              accept()
+              return
 
     # Rule #2: tcp between University, IT Dep, Faculty, Student Housing, and trustedPC
-    #       - NO: Internet
+    #       - NO: Internet subnet
     #       - Only Faculty LAN may access exam server
-
-
+      if tcp_header:
+          if switch_id != 's5' or (ip_header.srcip == trustedPC_ip or ip_header.dstip == trustedPC_ip):
+              ## accept between Exam and Faculty LAN 
+              if (ip_header.dstip == exam_ip or ip_header.dstip == examp_ip) and port_on_switch != 's2-eth0':
+                  drop()
+                  return
+              else:
+                  accept()
+                  return
+                
     # Rule #3: udp between University, IT Dep, Faculty, and Student Housing
-    #       - NO: Internet
-
+    #       - NO: Internet subnet
+      if udp_header:
+          if switch_id != 's5':
+              accept()
+              return
 
     # Rule #4: all other traffic is dropped
     drop()
