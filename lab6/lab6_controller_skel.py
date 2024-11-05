@@ -42,7 +42,7 @@ class Routing (object):
 
       # Faculty LAN
     facultyWS_ip = "10.0.1.2/24"
-    printer_ip = "10.0.1.4/24"
+    printer_ip = "10.0.1.3/24"
     facultyPC_ip = "10.0.1.4/24"
 
       # Student Housing LAN
