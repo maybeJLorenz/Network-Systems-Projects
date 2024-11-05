@@ -1,11 +1,11 @@
 # Lab5 Skeleton
 #
-#     Last Modified: november 4, 4:30pm
+#     Last Modified: november 5, 1pm
 # 
 
-from pox.core import core
+from pox.core import core # type: ignore
 
-import pox.openflow.libopenflow_01 as of
+import pox.openflow.libopenflow_01 as of # type: ignore
 
 log = core.getLogger()
 
@@ -20,7 +20,7 @@ class Routing (object):
     connection.addListeners(self)
 
   def do_routing (self, packet, packet_in, port_on_switch, switch_id):
-    # port_on_swtich - the port on which this packet was received
+    # port_on_switch - the port on which this packet was received
     # switch_id - the switch which received this packet
 
     # Your code here
@@ -29,9 +29,6 @@ class Routing (object):
     tcp_header = packet.find('tcp')
     udp_header = packet.find('udp')
     icmp_header = packet.find('icmp')
-
-    src_ip = packet.src_ip
-    dst_ip = packet.dst_ip
 
     ## Defining IPs
       # Univeristy Data Center
@@ -78,30 +75,30 @@ class Routing (object):
 
     # Rule #1: icmp between Student Housing, Faculty, and IT Dep. 
     #    NO: Univeristy or Internet subnet
-      if icmp_header:
-          if switch_id == 's2' or switch_id == 's3' or switch_id == 's4':
-              accept()
-              return
+    if icmp_header:
+      if switch_id == 's2' or switch_id == 's3' or switch_id == 's4':
+        accept()
+        return
 
     # Rule #2: tcp between University, IT Dep, Faculty, Student Housing, and trustedPC
     #       - NO: Internet subnet
     #       - Only Faculty LAN may access exam server
-      if tcp_header:
-          if switch_id != 's5' or (ip_header.srcip == trustedPC_ip or ip_header.dstip == trustedPC_ip):
-              ## accept between Exam and Faculty LAN 
-              if (ip_header.dstip == exam_ip or ip_header.dstip == examp_ip) and port_on_switch != 's2-eth0':
-                  drop()
-                  return
-              else:
-                  accept()
-                  return
+    if tcp_header:
+      if (switch_id != 's5') or (ip_header.srcip == trustedPC_ip or ip_header.dstip == trustedPC_ip):
+        ## drop tcp traffic to/from Exam if not coming from Faculty subnet
+        if (ip_header.dstip == exam_ip or ip_header.srcip == exam_ip) and port_on_switch != 's2-eth0':
+          drop()
+          return
+        else:
+          accept()
+          return
                 
     # Rule #3: udp between University, IT Dep, Faculty, and Student Housing
     #       - NO: Internet subnet
-      if udp_header:
-          if switch_id != 's5':
-              accept()
-              return
+    if udp_header:
+      if switch_id != 's5':
+        accept()
+        return
 
     # Rule #4: all other traffic is dropped
     drop()
@@ -128,3 +125,4 @@ def launch ():
     log.debug("Controlling %s" % (event.connection,))
     Routing(event.connection)
   core.openflow.addListenerByName("ConnectionUp", start_switch)
+
