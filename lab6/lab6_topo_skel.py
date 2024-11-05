@@ -14,26 +14,26 @@ class MyTopology(Topo):
 
     ## Adding Hosts
       ## Workstations
-    facultyWS = self.addHost('facultyWS', ip='10.0.1.2/24', defaultRoute="s2-eth0")
-    labWS = self.addHost('labWS', ip='10.0.2.3/24', defaultRoute="s3-eth0")
-    itWS = self.addHost('itWS', ip='10.40.3.30', defaultRoute="s4-eth0")
-
+    facultyWS = self.addHost('facultyWS', ip='10.0.1.2/24', mac="00:00:02:00:01", defaultRoute="s2-eth0")
+    labWS = self.addHost('labWS', ip='10.0.2.3/24', mac="00:00:03:00:01", defaultRoute="s3-eth0")
+    itWS = self.addHost('itWS', ip='10.40.3.30', mac="00:00:04:00:01", defaultRoute="s4-eth0")
+    
       ## Laptops
-    facultyPC = self.addHost('facultyPC', ip='10.0.1.4/24', defaultRoute="s2-eth0")
-    studentPC1 = self.addHost('studentPC1', ip='10.0.2.2/24', defaultRoute="s3-eth0")
-    studentPC2 = self.addHost('studentPC2', ip='10.0.2.40', defaultRoute="s3-eth0")
-    itPC = self.addHost('itPC', ip='10.40.3.254', defaultRoute="s4-eth0")
-    trustedPC = self.addHost('trustedPC', ip='10.0.203.6/32', defaultRoute="s1-eth0")
-    guest1 = self.addHost('guest1', ip='10.0.198.6/32', defaultRoute="s1-eth0")
-    guest2 = self.addHost('guest2', ip='10.0.198.10/32', defaultRoute="s1-eth0")
-
+    facultyPC = self.addHost('facultyPC', ip='10.0.1.4/24', mac="00:00:02:00:02", defaultRoute="s2-eth0")
+    studentPC1 = self.addHost('studentPC1', ip='10.0.2.2/24', mac="00:00:03:00:02", defaultRoute="s3-eth0")
+    studentPC2 = self.addHost('studentPC2', ip='10.0.2.40', mac="00:00:03:00:03", defaultRoute="s3-eth0")
+    itPC = self.addHost('itPC', ip='10.40.3.254', mac="00:00:04:00:02", defaultRoute="s4-eth0")
+    trustedPC = self.addHost('trustedPC', ip='10.0.203.6/32', mac="00:00:01:00:01", defaultRoute="s1-eth0")
+    guest1 = self.addHost('guest1', ip='10.0.198.6/32', mac="00:00:01:00:02", defaultRoute="s1-eth0")
+    guest2 = self.addHost('guest2', ip='10.0.198.10/32', mac="00:00:01:00:03", defaultRoute="s1-eth0")
+    
       ## Servers
-    examServer = self.addHost('examServer', ip='10.100.100.2/24', defaultRoute="s5-eth0")
-    webServer = self.addHost('webServer', ip='10.100.100.20', defaultRoute="s5-eth0")
-    dnsServer = self.addHost('dnsServer', ip='10.100.100.56', defaultRoute="s5-eth0")
-
+    examServer = self.addHost('examServer', ip='10.100.100.2/24', mac="00:00:05:00:01", defaultRoute="s5-eth0")
+    webServer = self.addHost('webServer', ip='10.100.100.20', mac="00:00:05:00:02", defaultRoute="s5-eth0")
+    dnsServer = self.addHost('dnsServer', ip='10.100.100.56', mac="00:00:05:00:03", defaultRoute="s5-eth0")
+    
       ## Other
-    printer = self.addHost('printer', ip='10.0.1.3/24', defaultRouter="s2-eth0")
+    printer = self.addHost('printer', ip='10.0.1.3/24', mac="00:00:02:00:03", defaultRoute="s2-eth0")
 
     ## Adding Switches
     s1 = self.addSwitch('s1') ## core switch
