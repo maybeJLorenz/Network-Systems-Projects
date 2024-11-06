@@ -1,6 +1,6 @@
 # Lab5 Skeleton
 #
-#     Last Modified: november 5, 1pm
+#     Last Modified: november 5, 11:30pm
 # 
 
 from pox.core import core # type: ignore
@@ -29,16 +29,17 @@ class Routing (object):
     tcp_header = packet.find('tcp')
     udp_header = packet.find('udp')
     icmp_header = packet.find('icmp')
+    
 
     ## Defining IPs
       # Univeristy Data Center
     exam_ip = "10.100.100.2/24"
-    web_ip = "10.100.100.20"
-    dns_ip = "10.100.100.56"
+    web_ip = "10.100.100.20/24"
+    dns_ip = "10.100.100.56/24"
 
       # IT Department LAN
-    itWS_ip = "10.40.3.30"
-    itPC_ip = "10.40.3.254"
+    itWS_ip = "10.40.3.30/24"
+    itPC_ip = "10.40.3.254/24"
 
       # Faculty LAN
     facultyWS_ip = "10.0.1.2/24"
@@ -47,8 +48,8 @@ class Routing (object):
 
       # Student Housing LAN
     student1_ip = "10.0.2.2/24"
-    student2_ip = "10.0.2.40"
-    lab_ip = "10.0.2.3/24"
+    student2_ip = "10.0.2.40/24"
+    lab_ip = "10.0.2.3/24" 
 
       # Internet
     trustedPC_ip = "10.0.203.6/32"
@@ -59,9 +60,7 @@ class Routing (object):
       msg = of.ofp_flow_mod()
       msg.data = packet_in
       msg.match = of.ofp_match.from_packet(packet)
-      msg.idle_timeout = 45
-      msg.hard_timeout = 600
-      msg.actions.append(of.ofp_action_output(port=of.OFPP_NORMAL))
+      msg.actions.append(of.ofp_action_output(port=end_port))
       msg.buffer_id = packet_in.buffer_id
       self.connection.send(msg)
       print("Packet Accepted - Flow Table Installed on Switches")
@@ -69,14 +68,12 @@ class Routing (object):
     def drop():
       msg = of.ofp_flow_mod()
       msg.match = of.ofp_match.from_packet(packet)
-      msg.idle_timeout = 45
-      msg.hard_timeout = 600
       print("Packet Dropped - Flow Table Installed on Switches")
 
     # Rule #1: icmp between Student Housing, Faculty, and IT Dep. 
     #    NO: Univeristy or Internet subnet
     if icmp_header:
-      if switch_id == 's2' or switch_id == 's3' or switch_id == 's4':
+      if switch_id == 2 or switch_id == 3 or switch_id == 4:
         accept()
         return
 
@@ -84,8 +81,8 @@ class Routing (object):
     #       - NO: Internet subnet
     #       - Only Faculty LAN may access exam server
     if tcp_header:
-      if (switch_id != 's5') or (ip_header.srcip == trustedPC_ip or ip_header.dstip == trustedPC_ip):
-        ## drop tcp traffic to/from Exam if not coming from Faculty subnet
+      if (switch_id != 5) or (ip_header.srcip == trustedPC_ip or ip_header.dstip == trustedPC_ip):
+        ## drop tcp traffic if a non-Faculty LAN is trying to access Exam 
         if (ip_header.dstip == exam_ip or ip_header.srcip == exam_ip) and port_on_switch != 's2-eth0':
           drop()
           return
@@ -96,13 +93,13 @@ class Routing (object):
     # Rule #3: udp between University, IT Dep, Faculty, and Student Housing
     #       - NO: Internet subnet
     if udp_header:
-      if switch_id != 's5':
+      if switch_id != 5:
         accept()
         return
 
     # Rule #4: all other traffic is dropped
     drop()
-      
+    
     pass
 
   def _handle_PacketIn (self, event):
@@ -125,4 +122,5 @@ def launch ():
     log.debug("Controlling %s" % (event.connection,))
     Routing(event.connection)
   core.openflow.addListenerByName("ConnectionUp", start_switch)
+
 
