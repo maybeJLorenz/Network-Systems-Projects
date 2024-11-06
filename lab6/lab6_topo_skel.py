@@ -44,32 +44,32 @@ class MyTopology(Topo):
 
     ## Adding Links
       ## University Data Center
-    self.addLink(examServer, s5, port=1, port=2)
-    self.addLink(webServer, s5, port=1, port=3)
-    self.addLink(dnsServer, s5, port=1, port=4)
-    self.addLink(s5, s1, port=5, port=5)
+    self.addLink(examServer, s5, port1=1, port2=2)
+    self.addLink(webServer, s5, port1=1, port2=3)
+    self.addLink(dnsServer, s5, port1=1, port2=4)
+    self.addLink(s5, s1, port1=5, port2=5)
 
       ## IT Department LAN
-    self.addLink(itWS, s4, port=1, port=2)
-    self.addLink(itPC, s4, port=1, port=3)
-    self.addLink(s4, s1, port=4, port=4)
+    self.addLink(itWS, s4, port1=1, port2=2)
+    self.addLink(itPC, s4, port1=1, port2=3)
+    self.addLink(s4, s1, port1=4, port2=4)
 
       ## Student Housing LAN
-    self.addLink(studentPC1, s3, port=1, port=2)
-    self.addLink(studentPC2, s3, port=1, port=3)
-    self.addLink(labWS, s3, port=1, port=4)
-    self.addLink(s3, s1, port=3, port=3)
+    self.addLink(studentPC1, s3, port1=1, port2=2)
+    self.addLink(studentPC2, s3, port1=1, port2=3)
+    self.addLink(labWS, s3, port1=1, port2=4)
+    self.addLink(s3, s1, port1=3, port2=3)
 
       ## Faculty LAN
-    self.addLink(facultyWS, s2, port=1, port=2)
-    self.addLink(printer, s2, port=1, port=3)
-    self.addLink(facultyPC, s2, port=1, port=4)
-    self.addLink(s2, s1, port=2, port=2)
+    self.addLink(facultyWS, s2, port1=1, port2=2)
+    self.addLink(printer, s2, port1=1, port2=3)
+    self.addLink(facultyPC, s2, port1=1, port2=4)
+    self.addLink(s2, s1, port1=2, port2=2)
 
       ## Internet
-    self.addLink(trustedPC, s1, port=1, port=2)
-    self.addLink(guest1, s1, port=1, port=3)
-    self.addLink(guest2, s1, port=1, port=4)
+    self.addLink(trustedPC, s1, port1=1, port2=2)
+    self.addLink(guest1, s1, port1=1, port2=3)
+    self.addLink(guest2, s1, port1=1, port2=4)
    
     # laptop1 = self.addHost('Laptop1', ip='200.20.2.8/24',defaultRoute="Laptop1-eth1")
 
