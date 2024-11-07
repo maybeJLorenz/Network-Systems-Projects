@@ -1,6 +1,6 @@
 # Lab5 Skeleton
 #
-#     Last Modified: november 5, 11:30pm
+#     Last Modified: november 6, 5:45pm
 # 
 
 from pox.core import core # type: ignore
@@ -60,7 +60,7 @@ class Routing (object):
       msg = of.ofp_flow_mod()
       msg.data = packet_in
       msg.match = of.ofp_match.from_packet(packet)
-      msg.actions.append(of.ofp_action_output(port=end_port))
+      msg.actions.append(of.ofp_action_output(port=1))
       msg.buffer_id = packet_in.buffer_id
       self.connection.send(msg)
       print("Packet Accepted - Flow Table Installed on Switches")
@@ -69,6 +69,8 @@ class Routing (object):
       msg = of.ofp_flow_mod()
       msg.match = of.ofp_match.from_packet(packet)
       print("Packet Dropped - Flow Table Installed on Switches")
+
+    
 
     # Rule #1: icmp between Student Housing, Faculty, and IT Dep. 
     #    NO: Univeristy or Internet subnet
@@ -122,5 +124,3 @@ def launch ():
     log.debug("Controlling %s" % (event.connection,))
     Routing(event.connection)
   core.openflow.addListenerByName("ConnectionUp", start_switch)
-
-
