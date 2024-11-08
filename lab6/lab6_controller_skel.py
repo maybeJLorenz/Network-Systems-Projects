@@ -1,6 +1,6 @@
 # Lab5 Skeleton
 #
-#     Last Modified: november 7, 5pm
+#     Last Modified: november 7, 8:15pm
 # 
 
 from pox.core import core
@@ -49,7 +49,7 @@ class Routing (object):
     icmp_header = packet.find('icmp')
 
 
-
+    # Subnets
     faculty_subnet = ipaddress.ip_network("10.0.1.0/24")
     student_subnet = ipaddress.ip_network("10.0.2.0/24")
     it_subnet = ipaddress.ip_network("10.40.3.0/24")
@@ -57,6 +57,7 @@ class Routing (object):
     internet_subnet = ipaddress.ip_network("10.0.198.0/32")
 
 
+    # IP Addresses
     facultyWS_ip = ipaddress.ip_address("10.0.1.2")
     printer_ip = ipaddress.ip_address("10.0.1.3")
     facultyPC_ip = ipaddress.ip_address("10.0.1.4")
@@ -85,20 +86,22 @@ class Routing (object):
     badPortsR1 = [1, 5, 7, 6]
 
     ## packet is in Core Switch (s1)
-    if switch_id == 1 and icmp_header and port_on_switch not in badPortsR1: 
-      if src_ip in internet_subnet or src_ip == trustedPC_ip or src_ip in university_subnet:
-         drop() ## dropping packets from internet or university subnet
-         return
-      elif dst_ip in faculty_subnet:
-         accept(2)
-         return
-      elif dst_ip in student_subnet:
-         accept(3)
-         return
-      elif dst_ip in it_subnet:
-         accept(4)
-         return
-
+    if switch_id == 1:
+      if icmp_header:
+        if src_ip in internet_subnet or src_ip == trustedPC_ip or src_ip in university_subnet:
+          drop() ## dropping packets from internet or university subnet
+          return
+        if port_on_switch in [2, 3, 4]:
+          if dst_ip in faculty_subnet:
+            accept(2)
+            return
+          elif dst_ip in student_subnet:
+            accept(3)
+            return
+          elif dst_ip in it_subnet:
+            accept(4)
+            return
+          
     ## packet is in Faculty Switch (s2)
     if switch_id == 2 and icmp_header:
       if dst_ip == facultyWS_ip:
