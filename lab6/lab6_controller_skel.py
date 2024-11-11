@@ -1,6 +1,6 @@
 # Lab5 Skeleton
 #
-#     Last Modified: november 11, 2:50am
+#     Last Modified: november 11, 1:40pm
 # 
 
 from pox.core import core
@@ -84,7 +84,7 @@ class Routing (object):
     # port_on_switch - the port on which this packet was received
     # switch_id - the switch which received this packet
 
-    # Rule #1: icmp between Student Housing, Faculty, and IT Dep. 
+    # NOTE - Rule #1: icmp between Student Housing, Faculty, and IT Dep. 
     #    NO: Univeristy or Internet subnet 
     if ip_header:
       src_ip = ip_header.srcip
@@ -95,7 +95,7 @@ class Routing (object):
 
     ## packet is in Core Switch (s1)
     if switch_id == 1:
-      if icmp_header: ## ======== start of RULE 1 ============
+      if icmp_header: ##NOTE ======== start of RULE 1 ============
         if not (src_ip in university_subnet and dst_ip in university_subnet): ## DROP if icmp packet src and dst are not in University subnet
           drop()
           return
@@ -114,6 +114,7 @@ class Routing (object):
             return
           elif src_ip in university_subnet and dst_ip in university_subnet:
             accept(5)
+            return
           elif src_ip in internet_subnet and dst_ip in internet_subnet:
             if dst_ip == guest1_ip:
               accept(7)
@@ -127,7 +128,7 @@ class Routing (object):
           drop()
           return
         
-      if tcp_header: ## ========== start of RULE 2 =============
+      if tcp_header: #NOTE ========== start of RULE 2 =============
         if dst_ip == trustedPC_ip: ## ACCEPT all packets to trustedPC
           accept(1)
         if (src_ip == guest1_ip or src_ip == guest2_ip):
@@ -159,13 +160,17 @@ class Routing (object):
         if dst_ip in it_subnet:
           accept(4)
           return
-        if dst_ip in university_subnet:
+        if dst_ip not in university_subnet:
           accept(5)
           return
         else:
           drop()
-        
-        
+      
+      if udp_header:
+        print()
+    ## NOTE - END OF SWITCH 1 CODE ========================
+
+
     ## ICMP packet is in Faculty Switch (s2), distribute to Faculty hosts
     if switch_id == 2 and icmp_header and port_on_switch == 2:
       if dst_ip == facultyWS_ip:
@@ -208,6 +213,7 @@ class Routing (object):
         accept(4)
         return
       
+      ## ICMP packet is in University Switch (s5), distribute to University hosts
     if switch_id == 5 and icmp_header and port_on_switch == 5:
       if dst_ip == examServer_ip:
         accept(1)
@@ -222,7 +228,8 @@ class Routing (object):
         accept(5)
         return
         
-    # Rule #2: tcp between University, IT Dep, Faculty, Student Housing, and trustedPC
+
+    # NOTE Rule #2: tcp between University, IT Dep, Faculty, Student Housing, and trustedPC
     #       - NO: Internet subnet
     #       - Only Faculty LAN may access exam server
     if switch_id == 2 and tcp_header and port_on_switch == 2: ## TCP packet in Faculty Switch, send to Faculty hosts
@@ -260,14 +267,79 @@ class Routing (object):
         return 
 
     if switch_id == 4 and tcp_header and port_on_switch == 4: ## TCP packet in IT Switch, send to IT hosts
-      print()
+      if dst_ip == guest1_ip or dst_ip == guest2_ip:
+        drop()
+        return
+      if dst_ip == itWS_ip:
+        accept(1)
+        return
+      elif dst_ip == itPC_ip:
+        accept(2)
+        return
+      elif dst_ip not in it_subnet:
+        accept(4)
+        return
 
     if switch_id == 5 and tcp_header and port_on_switch == 5: ## TCP packet in University Switch, send to University hosts
-      print()
-    # # Rule #3: udp between University, IT Dep, Faculty, and Student Housing
-    # #       - NO: Internet subnet
+      if dst_ip == guest1_ip or dst_ip == guest2_ip:
+        drop()
+        return
+      if (src_ip not in faculty_subnet) and dst_ip == examServer_ip:
+        drop()
+        return
+      elif (src_ip in faculty_subnet and dst_ip == examServer_ip) or (src_ip in university_subnet and dst_ip in university_subnet):
+        accept(1)
+        return
+      if dst_ip == webServer_ip:
+        accept(2)
+        return
+      elif dst_ip == dnsServer_ip:
+        accept(3)
+        return
+      elif dst_ip not in university_subnet:
+        accept(5)
+        return
+    
 
-    # Rule #4: all other traffic is dropped
+    
+    # # NOTE - Rule #3: udp between University, IT Dep, Faculty, and Student Housing
+    # #       - NO: Internet subnet
+    if switch_id == 2 and udp_header and port_on_switch == 2:
+      if src_ip in internet_subnet or dst_ip in internet_subnet:
+        drop()
+        return
+      if dst_ip == facultyWS_ip:
+        accept(1)
+        return
+      elif dst_ip == printer_ip:
+        accept(3)
+        return
+      elif dst_ip == facultyPC_ip:
+        accept(4)
+        return
+      elif dst_ip not in faculty_subnet:
+        accept(2)
+        return
+    
+
+    if switch_id == 3 and udp_header and port_on_switch == 3:
+      if src_ip in internet_subnet or dst_ip in internet_subnet:
+        drop()
+        return
+      if dst_ip == studentPC1_ip:
+        accept(1)
+        return
+      elif dst_ip == labWS_ip:
+        accept(2)
+        return
+      elif dst_ip == studentPC2_ip:
+        accept(4)
+        return
+      elif dst_ip not in student_subnet:
+        accept(3)
+        return 
+
+    # * NOTE - Rule #4: all other traffic is dropped
     drop()
     return
     
@@ -292,4 +364,3 @@ def launch ():
     log.debug("Controlling %s" % (event.connection,))
     Routing(event.connection)
   core.openflow.addListenerByName("ConnectionUp", start_switch)
-
