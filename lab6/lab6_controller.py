@@ -1,6 +1,6 @@
 # Lab5 Skeleton
 #
-#     Last Modified: november 11, 5:55pm - finished rule 3 (done?)
+#     Last Modified: november 11, 8:40pm
 # 
 
 from pox.core import core
@@ -86,16 +86,14 @@ class Routing (object):
 
     # NOTE - Rule #1: icmp between Student Housing, Faculty, and IT Dep. 
     #    NO: Univeristy or Internet subnet 
-    if ip_header:
-      src_ip = ip_header.srcip
-      dst_ip = ip_header.dstip
-    else:
-      drop()
+    
+    src_ip = ip_header.srcip
+    dst_ip = ip_header.dstip
 
 
     ## packet is in Core Switch (s1)
     if switch_id == 1:
-      if icmp_header: ##NOTE ======== start of RULE 1 ============
+      if icmp_header: ## NOTE ======== start of RULE 1 ============
         if not (src_ip in university_subnet and dst_ip in university_subnet): ## DROP if icmp packet src and dst are not in University subnet
           drop()
           return
@@ -124,6 +122,7 @@ class Routing (object):
               return
             elif dst_ip == trustedPC_ip:
               accept(1)
+              return
         else:
           drop()
           return
@@ -131,10 +130,12 @@ class Routing (object):
       if tcp_header: #NOTE ========== start of RULE 2 =============
         if dst_ip == trustedPC_ip: ## ACCEPT all packets to trustedPC
           accept(1)
+          return
         if (src_ip == guest1_ip or src_ip == guest2_ip):
           if dst_ip not in internet_subnet:
             drop() ## DROP if guests try to send packet to different subnet
-          else:
+            return  
+        elif src_ip in internet_subnet and dst_ip in internet_subnet:
             if dst_ip == guest1_ip:
               accept(7)
               return
@@ -144,13 +145,6 @@ class Routing (object):
             elif dst_ip == trustedPC_ip:
               accept(1)
               return
-        if src_ip == trustedPC_ip and dst_ip in internet_subnet:
-          if dst_ip == guest1_ip:
-              accept(7)
-              return
-          elif dst_ip == guest2_ip:
-            accept(6)
-            return
         if dst_ip in faculty_subnet:
           accept(2)
           return
@@ -165,9 +159,10 @@ class Routing (object):
           return
         else:
           drop()
+          return
       
-      if udp_header:
-        if port_on_switch in [1, 6, 7]:
+      if udp_header: ## NOTE - start rule 3 ==============
+        if src_ip in internet_subnet and dst_ip in internet_subnet:
           if dst_ip == guest1_ip:
             accept(7)
             return
@@ -193,7 +188,7 @@ class Routing (object):
 
 
     ## ICMP packet is in Faculty Switch (s2), distribute to Faculty hosts
-    if switch_id == 2 and icmp_header and port_on_switch == 2:
+    if switch_id == 2 and icmp_header:
       if dst_ip == facultyWS_ip:
         accept(1)
         return
@@ -204,11 +199,11 @@ class Routing (object):
         accept(4)
         return
       else:
-        accept(2)
+        accept(2) ## Go back to core switch
         return
       
     ## ICMP packet is in Student Switch (s3), distribute to Student hosts
-    if switch_id == 3 and icmp_header and port_on_switch == 3:
+    if switch_id == 3 and icmp_header:
       if dst_ip == studentPC1_ip:
         accept(1)
         return
@@ -223,7 +218,7 @@ class Routing (object):
         return
 
     ## ICMP packet is in IT Switch (s3), distribute to IT hosts
-    if switch_id == 4 and icmp_header and port_on_switch == 4:
+    if switch_id == 4 and icmp_header:
       if dst_ip == itWS_ip:
         accept(1)
         return
@@ -235,7 +230,7 @@ class Routing (object):
         return
       
       ## ICMP packet is in University Switch (s5), distribute to University hosts
-    if switch_id == 5 and icmp_header and port_on_switch == 5:
+    if switch_id == 5 and icmp_header:
       if dst_ip == examServer_ip:
         accept(1)
         return
@@ -253,7 +248,7 @@ class Routing (object):
     # NOTE Rule #2: tcp between University, IT Dep, Faculty, Student Housing, and trustedPC
     #       - NO: Internet subnet
     #       - Only Faculty LAN may access exam server
-    if switch_id == 2 and tcp_header and port_on_switch == 2: ## TCP packet in Faculty Switch, send to Faculty hosts
+    if switch_id == 2 and tcp_header: ## TCP packet in Faculty Switch, send to Faculty hosts
       if dst_ip == guest1_ip or dst_ip == guest2_ip:
         drop()
         return
@@ -270,7 +265,7 @@ class Routing (object):
         accept(2)
         return
     
-    if switch_id == 3 and tcp_header and port_on_switch == 3: ## TCP packet in Student Switch, send to Student hosts
+    if switch_id == 3 and tcp_header: ## TCP packet in Student Switch, send to Student hosts
       if dst_ip == guest1_ip or dst_ip == guest2_ip:
         drop()
         return
@@ -287,7 +282,7 @@ class Routing (object):
         accept(3)
         return 
 
-    if switch_id == 4 and tcp_header and port_on_switch == 4: ## TCP packet in IT Switch, send to IT hosts
+    if switch_id == 4 and tcp_header: ## TCP packet in IT Switch, send to IT hosts
       if dst_ip == guest1_ip or dst_ip == guest2_ip:
         drop()
         return
@@ -301,7 +296,7 @@ class Routing (object):
         accept(4)
         return
 
-    if switch_id == 5 and tcp_header and port_on_switch == 5: ## TCP packet in University Switch, send to University hosts
+    if switch_id == 5 and tcp_header: ## TCP packet in University Switch, send to University hosts
       if dst_ip == guest1_ip or dst_ip == guest2_ip:
         drop()
         return
@@ -325,7 +320,7 @@ class Routing (object):
     
     # # NOTE - Rule #3: udp between University, IT Dep, Faculty, and Student Housing
     # #       - NO: Internet subnet
-    if switch_id == 2 and udp_header and port_on_switch == 2:
+    if switch_id == 2 and udp_header:
       if src_ip in internet_subnet or dst_ip in internet_subnet:
         drop()
         return
@@ -343,7 +338,7 @@ class Routing (object):
         return
     
 
-    if switch_id == 3 and udp_header and port_on_switch == 3:
+    if switch_id == 3 and udp_header:
       if src_ip in internet_subnet or dst_ip in internet_subnet:
         drop()
         return
@@ -360,7 +355,7 @@ class Routing (object):
         accept(3)
         return 
     
-    if switch_id == 4 and udp_header and port_on_switch == 4:
+    if switch_id == 4 and udp_header:
       if src_ip in internet_subnet or dst_ip in internet_subnet:
         drop()
         return
@@ -374,7 +369,7 @@ class Routing (object):
         accept(4)
         return 
 
-    # * NOTE - Rule #4: all other traffic is dropped
+    # NOTE - Rule #4: all other traffic is dropped
     drop()
     return
     
