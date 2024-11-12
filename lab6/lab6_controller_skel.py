@@ -1,6 +1,6 @@
 # Lab5 Skeleton
 #
-#     Last Modified: november 11, 1:40pm
+#     Last Modified: november 11, 5:55pm - finished rule 3 (done?)
 # 
 
 from pox.core import core
@@ -167,7 +167,28 @@ class Routing (object):
           drop()
       
       if udp_header:
-        print()
+        if port_on_switch in [1, 6, 7]:
+          if dst_ip == guest1_ip:
+            accept(7)
+            return
+          elif dst_ip == guest2_ip:
+            accept(6)
+            return
+          elif dst_ip == trustedPC_ip:
+            accept(1)
+            return
+        elif dst_ip in faculty_subnet:
+          accept(2)
+          return
+        elif dst_ip in university_subnet:
+          accept(5)
+          return
+        elif dst_ip in it_subnet:
+          accept(4)
+          return
+        elif dst_ip in student_subnet:
+          accept(3)
+          return
     ## NOTE - END OF SWITCH 1 CODE ========================
 
 
@@ -337,6 +358,20 @@ class Routing (object):
         return
       elif dst_ip not in student_subnet:
         accept(3)
+        return 
+    
+    if switch_id == 4 and udp_header and port_on_switch == 4:
+      if src_ip in internet_subnet or dst_ip in internet_subnet:
+        drop()
+        return
+      if dst_ip == itWS_ip:
+        accept(1)
+        return
+      elif dst_ip == itPC_ip:
+        accept(2)
+        return
+      elif dst_ip not in student_subnet:
+        accept(4)
         return 
 
     # * NOTE - Rule #4: all other traffic is dropped
