@@ -100,7 +100,7 @@ class Routing (object):
         if not (src_ip in internet_subnet and dst_ip in internet_subnet): ## DROP if icmp packet src and dst are not in Internet subnet
           drop()
           return
-        if port_on_switch in [1, 2, 3, 4, 5, 6, 7]:
+        if port_on_switch in [2, 3, 4, 5, 6, 7]:
           if dst_ip in faculty_subnet:
             accept(2)
             return
@@ -120,9 +120,6 @@ class Routing (object):
             elif dst_ip == guest2_ip:
               accept(6)
               return
-            elif dst_ip == trustedPC_ip:
-              accept(1)
-              return
         else:
           drop()
           return
@@ -141,9 +138,6 @@ class Routing (object):
               return
             elif dst_ip == guest2_ip:
               accept(6)
-              return
-            elif dst_ip == trustedPC_ip:
-              accept(1)
               return
         if dst_ip in faculty_subnet:
           accept(2)
@@ -168,9 +162,6 @@ class Routing (object):
             return
           elif dst_ip == guest2_ip:
             accept(6)
-            return
-          elif dst_ip == trustedPC_ip:
-            accept(1)
             return
         elif dst_ip in faculty_subnet:
           accept(2)
