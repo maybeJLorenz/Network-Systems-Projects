@@ -24,7 +24,6 @@ class Routing (object):
     # switch_id - the switch which received this packet
 
     # Your code here
-    def do_routing(self, packet, packet_in, port_on_switch, switch_id):
     def accept(end_port):
         msg = of.ofp_flow_mod()
         msg.data = packet_in
@@ -52,6 +51,40 @@ class Routing (object):
         if ip.startswith('10.0.198.'): return 'GUEST'
         return None
 
+    # Get destination port based on IP and switch
+    def get_destination_port(switch_id, dst_ip):
+        if switch_id == 1:  # Core switch (s1)
+            if str(dst_ip).startswith('10.0.1.'): return 2  # To Faculty
+            if str(dst_ip).startswith('10.0.2.'): return 3  # To Student
+            if str(dst_ip).startswith('10.40.3.'): return 4  # To IT
+            if str(dst_ip).startswith('10.100.100.'): return 5  # To Data Center
+            if str(dst_ip) == '10.0.203.6': return 1  # To trustedPC
+            if str(dst_ip).startswith('10.0.198.6'): return 6  # To guest1
+            if str(dst_ip).startswith('10.0.198.10'): return 7  # To guest2
+        
+        elif switch_id == 2:  # Faculty switch (s2)
+            if str(dst_ip) == '10.0.1.2': return 1  # To facultyWS
+            if str(dst_ip) == '10.0.1.3': return 3  # To printer
+            if str(dst_ip) == '10.0.1.4': return 4  # To facultyPC
+            return 2  # Default return to core switch
+        
+        elif switch_id == 3:  # Student switch (s3)
+            if str(dst_ip) == '10.0.2.2': return 1  # To studentPC1
+            if str(dst_ip) == '10.0.2.40': return 2  # To studentPC2
+            if str(dst_ip) == '10.0.2.3': return 4  # To labWS
+            return 3  # Default return to core switch
+        
+        elif switch_id == 4:  # IT switch (s4)
+            if str(dst_ip) == '10.40.3.30': return 1  # To itWS
+            if str(dst_ip) == '10.40.3.254': return 2  # To itPC
+            return 4  # Default return to core switch
+        
+        elif switch_id == 5:  # Data Center switch (s5)
+            if str(dst_ip) == '10.100.100.2': return 1  # To examServer
+            if str(dst_ip) == '10.100.100.20': return 2  # To webServer
+            if str(dst_ip) == '10.100.100.56': return 3  # To dnsServer
+            return 5  # Default return to core switch
+
     # Extract IP packet
     ip_packet = packet.find('ipv4')
     if ip_packet is None:
@@ -63,47 +96,45 @@ class Routing (object):
     src_net = get_network(ip_packet.srcip)
     dst_net = get_network(ip_packet.dstip)
 
-    # Determine protocol
+    # Get the appropriate output port
+    output_port = get_destination_port(switch_id, ip_packet.dstip)
+
+    # Handle traffic based on protocol
     if packet.find('icmp'):
         # Rule 1: ICMP Traffic
         allowed_networks = ['STUDENT', 'FACULTY', 'IT']
-        if src_net == dst_net:
-            accept(packet_in.in_port)
-        elif src_net in allowed_networks and dst_net in allowed_networks:
-            accept(packet_in.in_port)
+        if src_net == dst_net or (src_net in allowed_networks and dst_net in allowed_networks):
+            accept(output_port)
         else:
             drop()
 
     elif packet.find('tcp'):
         # Rule 2: TCP Traffic
         allowed_networks = ['DATACENTER', 'IT', 'FACULTY', 'STUDENT', 'TRUSTED']
-        if src_net == dst_net:
-            accept(packet_in.in_port)
-        elif src_net in allowed_networks and dst_net in allowed_networks:
+        if src_net == dst_net or (src_net in allowed_networks and dst_net in allowed_networks):
             # Special case: exam server access
             if dst_net == 'DATACENTER' and '10.100.100.2' in str(packet.dst):
                 if src_net == 'FACULTY':
-                    accept(packet_in.in_port)
+                    accept(output_port)
                 else:
                     drop()
             else:
-                accept(packet_in.in_port)
+                accept(output_port)
         else:
             drop()
 
     elif packet.find('udp'):
         # Rule 3: UDP Traffic
         allowed_networks = ['DATACENTER', 'IT', 'FACULTY', 'STUDENT']
-        if src_net == dst_net:
-            accept(packet_in.in_port)
-        elif src_net in allowed_networks and dst_net in allowed_networks:
-            accept(packet_in.in_port)
+        if src_net == dst_net or (src_net in allowed_networks and dst_net in allowed_networks):
+            accept(output_port)
         else:
             drop()
 
     else:
         # Rule 4: Drop all other traffic
         drop()
+   
     
   def _handle_PacketIn (self, event):
     """
