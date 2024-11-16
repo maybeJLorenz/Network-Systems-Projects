@@ -48,7 +48,7 @@ class Routing (object):
         if ip.startswith('10.40.3.'): return 'IT'
         if ip.startswith('10.100.100.'): return 'DATACENTER'
         if ip == '10.0.203.6': return 'TRUSTED'
-        if ip.startswith('10.0.198.'): return 'GUEST'
+        if ip.startswith('10.0.198.'): return 'GUEST'  # Will be blocked in traffic rules
         return None
 
     # Get destination port based on IP and switch
@@ -59,8 +59,7 @@ class Routing (object):
             if str(dst_ip).startswith('10.40.3.'): return 4  # To IT
             if str(dst_ip).startswith('10.100.100.'): return 5  # To Data Center
             if str(dst_ip) == '10.0.203.6': return 1  # To trustedPC
-            if str(dst_ip).startswith('10.0.198.6'): return 6  # To guest1
-            if str(dst_ip).startswith('10.0.198.10'): return 7  # To guest2
+            # Removed guest forwarding ports since they're blocked
         
         elif switch_id == 2:  # Faculty switch (s2)
             if str(dst_ip) == '10.0.1.2': return 1  # To facultyWS
@@ -95,6 +94,11 @@ class Routing (object):
     # Get source and destination networks
     src_net = get_network(ip_packet.srcip)
     dst_net = get_network(ip_packet.dstip)
+
+    # Block all guest traffic immediately
+    if src_net == 'GUEST' or dst_net == 'GUEST':
+        drop()
+        return
 
     # Get the appropriate output port
     output_port = get_destination_port(switch_id, ip_packet.dstip)
