@@ -5,7 +5,7 @@ from mininet.cli import CLI
 from mininet.node import RemoteController
 #
 #
-#     Last Modified: november 7, 8:15pm
+#     Last Modified: november 15, 6:40pm
 #
 
 class MyTopology(Topo):
@@ -37,6 +37,10 @@ class MyTopology(Topo):
     guest1 = self.addHost('guest1', ip='10.0.198.6/32', mac="00:00:01:00:02:01", defaultRoute="guest1-eth1")
     guest2 = self.addHost('guest2', ip='10.0.198.10/32', mac="00:00:01:00:03:01", defaultRoute="guest2-eth1")
 
+    #Discord Server
+    dServer = self.addHost('dServer', ip='10.0.123.3/32', mac="00:00:01:00:04:01", defaultRoute="dServer-eth1")
+    
+    
     ## Adding Switches
     s1 = self.addSwitch('s1') ## core switch
     s2 = self.addSwitch('s2') ## faculty switch
@@ -72,6 +76,7 @@ class MyTopology(Topo):
     self.addLink(trustedPC, s1, port1=1, port2=1)
     self.addLink(guest1, s1, port1=1, port2=6)
     self.addLink(guest2, s1, port1=1, port2=7)
+    self.addLink(dServer, s1, port1=1, port2=8)
 
       ## Links between Switches
    
