@@ -119,10 +119,10 @@ class ChatClient:
 
 def main():
     # Set up argument parser
-    parser = argparse.ArgumentParser(description="TCP Chat Client")
-    parser.add_argument("--id", required=True, help="Client ID")
-    parser.add_argument("--port", type=int, required=True, help="Client listening port")
-    parser.add_argument("--server", required=True, help="Server IP:Port")
+    parser = argparse.ArgumentParser(description="Client program for REGISTER and BRIDGE requests.")
+    parser.add_argument("--id", required=False, default="testclient", help="Client ID (name of the user)")
+    parser.add_argument("--port", type=int, required=False, default=3000, help="Client port number")
+    parser.add_argument("--server", required=False, default="127.0.0.1:5555", help="Server IP and port (format: IP:port)")
     
     # Parse arguments
     args = parser.parse_args()
