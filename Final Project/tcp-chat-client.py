@@ -1,6 +1,5 @@
 import socket
 import argparse
-import select
 import sys
 
 class ChatClient:
@@ -80,49 +79,13 @@ class ChatClient:
             print("Bridge Response:", response)
         except Exception as e:
             print(f"Bridge request error: {e}")
-    
-    def start(self):
-        """
-        Main client interaction loop
-        """
-        # Establish server connection
-        self.create_server_connection()
-        
-        # Main interaction loop
-        while True:
-            try:
-                # Get user input
-                user_input = input("Enter command (/id, /register, /bridge, /quit): ").strip()
-                
-                if user_input == "/id":
-                    print(f"Client ID: {self.client_id}")
-                elif user_input == "/register":
-                    self.send_register_request()
-                elif user_input == "/bridge":
-                    self.send_bridge_request()
-                elif user_input == "/quit":
-                    quit_msg = f"QUIT\r\nClient {self.client_id} is disconnecting\r\n\r\n"
-                    self.server_socket.send(quit_msg.encode())
-                    break
-                else:
-                    print("Invalid command. Use /id, /register, /bridge, or /quit.")
-            
-            except KeyboardInterrupt:
-                print("\nClient interrupted. Closing connection.")
-                break
-            except Exception as e:
-                print(f"An error occurred: {e}")
-        
-        # Close server socket
-        if self.server_socket:
-            self.server_socket.close()
 
 def main():
     # Set up argument parser
-    parser = argparse.ArgumentParser(description="Client program for REGISTER and BRIDGE requests.")
-    parser.add_argument("--id", required=False, default="testclient", help="Client ID (name of the user)")
-    parser.add_argument("--port", type=int, required=False, default=3000, help="Client port number")
-    parser.add_argument("--server", required=False, default="127.0.0.1:5555", help="Server IP and port (format: IP:port)")
+    parser = argparse.ArgumentParser(description="TCP Chat Client")
+    parser.add_argument("--id", required=True, help="Client ID")
+    parser.add_argument("--port", type=int, required=True, help="Client listening port")
+    parser.add_argument("--server", required=True, help="Server IP:Port")
     
     # Parse arguments
     args = parser.parse_args()
@@ -132,17 +95,51 @@ def main():
         server_ip, server_port = args.server.split(':')
         server_port = int(server_port)
     except ValueError:
-        print("Invalid server argument. Use format: IP:Port")
+        print("Error: Invalid server argument. Use format: IP:Port")
         sys.exit(1)
     
-    # Create and start client
+    # Validate port
+    if not (1024 <= args.port <= 65535):
+        print("Error: Invalid port number. Use a port between 1024 and 65535.")
+        sys.exit(1)
+    
+    # Create client instance
     client = ChatClient(
         client_id=args.id, 
         server_addr=server_ip, 
         server_port=server_port, 
         client_port=args.port
     )
-    client.start()
+    
+    # Establish server connection
+    client.create_server_connection()
+    
+    # Run indefinitely
+    while True:
+        try:
+            # Get input
+            user_input = input("Enter command (/id, /register, /bridge, /quit): ").strip()
+            
+            # Process input
+            if user_input == "/id":
+                print(f"User ID: {client.client_id}")
+            elif user_input == "/register":
+                client.send_register_request()
+            elif user_input == "/bridge":
+                client.send_bridge_request()
+            elif user_input == "/quit":
+                break
+            else:
+                print("Error: Invalid input. Please use /id, /register, /bridge, or /quit.")
+        
+        except KeyboardInterrupt:
+            print("\nProgram terminated by user.")
+            break
+    
+    # Terminate program
+    if client.server_socket:
+        client.server_socket.close()
+    print("Client terminated.")
 
 if __name__ == "__main__":
     main()
