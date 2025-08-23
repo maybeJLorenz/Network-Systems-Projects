@@ -23,15 +23,4 @@ I also built a simple chat system using TCP sockets. I wanted to see how multipl
 - Real-time messaging
 - Basic user management  
 
-It was amazing to see messages flow seamlessly between clients, and it really helped me understand how TCP works under the hood.  
-
-## Getting Started
-
-### Prerequisites
-- C++ compiler (for the firewall project)  
-- Python or C++ environment (depending on which version of the chat system you run)  
-
-### How to Run
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/NEW-REPO-NAME.git
+It was amazing to see messages flow seamlessly between clients, and it really helped me understand how TCP works under the hood.
