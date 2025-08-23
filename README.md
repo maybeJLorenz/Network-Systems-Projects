@@ -5,7 +5,7 @@ I’m excited to share some projects I built during my **CSE150: Computer Networ
 
 ## Projects
 
-### 1. University Firewall 🛡️
+### 1. University Firewall 🛡️🔒
 This was my attempt at building a firewall that could monitor and control network traffic within a university network. I enjoyed figuring out how to inspect packets and create rules that actually work.  
 
 **What I implemented:**
@@ -15,7 +15,7 @@ This was my attempt at building a firewall that could monitor and control networ
 
 It was super rewarding to see the firewall catch “malicious” traffic in my tests—I felt like a real network security engineer!  
 
-### 2. TCP Chat System
+### 2. TCP Chat System 👩‍💻 - 🛜 - 👨‍💻
 I also built a simple chat system using TCP sockets. I wanted to see how multiple clients could connect to a server and send messages in real time.  
 
 **Features I focused on:**
