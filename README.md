@@ -15,7 +15,7 @@ This was my attempt at building a firewall that could monitor and control networ
 
 It was super rewarding to see the firewall catch “malicious” traffic in my tests. I felt like I got a feel of what it's like to be a network security engineer!  
 
-### 2. [TCP Chat System](./Final Project) 👩‍💻 - 🛜 - 👨‍💻
+### 2. [TCP Chat System](./Final%20Project) 👩‍💻 - 🛜 - 👨‍💻
 I also built a simple chat system using TCP sockets. I wanted to see how multiple clients could connect to a server and send messages in real time.  
 
 **Features I focused on:**
