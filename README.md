@@ -6,7 +6,7 @@ I’m excited to share some projects I built during my **CSE150: Computer Networ
 ## Projects
 
 ### 1. [University Firewall](./lab6) 🛡️🔒
-This was my attempt at building a firewall that could monitor and control network traffic within a simulated university network. I enjoyed figuring out how to inspect packets and create rules that actually work.  
+This was my attempt at building a firewall that could monitor and control network traffic within a simulated university network. I enjoyed figuring out how to inspect packets and create rules that actually work. I also implemeted a topology structure of a university network. It includes a main router with additional routers leading to various subnets (Ex: Faculty LAN, IT LAN, etc.)  
 
 **What I implemented:**
 - Packet inspection
